@@ -1,0 +1,161 @@
+\documentclass{article}
+\usepackage[final]{neurips_2021}
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{xcolor}         % colors
+
+
+\title{Project Proposal for UMC 203: \\
+Flow Based Generative Models}
+
+\author{%
+  Akshaya Garepally \\
+  25398 \\
+  \texttt{gakshaya@iisc.ac.in}
+    \And
+  Archana Yadav \\
+  25315 \\
+  \texttt{archanay@iisc.ac.in.in}
+    \And
+  Himanshi Sarode \\
+  25406\\
+  \texttt{himanshis@iisc.ac.in}
+  \And
+  Sri Varshinee S \\
+  24484 \\
+  \texttt{varshinees@iisc.ac.in}
+  \And
+  Swetha Nomula \\
+  25391 \\
+  \texttt{swethan@iisc.ac.in.in}
+}
+
+\begin{document}
+
+\maketitle
+
+
+\section{Introduction}
+\paragraph{}
+Generative modelling is a key area of machine learning that focuses on learning the underlying probability distribution of data so that new samples resembling the training data can be generated. Flow-based models, one of the types of deep generative models, have emerged as a powerful class of such models that enable efficient sampling and exact likelihood estimation such that the likelihoods are tractable unlike adversarial models. 
+\paragraph{}
+They challenges faced in the designing of these is that each transformation must be invertible and must allow efficient computation of the Jacobian Determinant, thus restricting the types of neural network layers that can be used. Additionally, achieving sufficient expressiveness while maintaining computational efficiency remains a key architectural challenge.
+\paragraph{}
+Flow-based models address density estimation using the change-of-variables principle, where the complex data distributions are obtained by applying a sequence if invertible transformations to a simple base distribution, generally Gaussian. 
+\[\log p_X(x) = \log p_Z(f(x)) + \log \left| \det \frac{\partial f(x)}{\partial x} \right|\]
+\paragraph{}
+.By stacking multiple such transformations, these models can progressively learn complex data distributions while preserving tractable likelihood computation. Unlike GANs, they provide exact likelihood estimation, and unlike VAEs, they avoid approximate inference.`
+\section{Related Work}
+\label{gen_inst}
+
+    
+NICE provides the foundation by introducing additive coupling layers, where part of the input remains unchanged while the other part is transformed. This makes the Jacobian determinant easy to compute, enabling exact likelihood-based training. However, its additive transformations are limited in expressiveness, making it harder to model highly complex data distributions.
+
+RealNVP builds on NICE by addressing this limitation through affine coupling layers, which allow both scaling and shifting. It also uses masking to partition the input so that one subset remains unchanged while the other is transformed, preserving invertibility and making the Jacobian easy to compute. This makes the model significantly more expressive while still enabling tractable likelihood computation. In addition, RealNVP introduces a multi-scale architecture, improving efficiency and helping capture hierarchical structure in images. However, because only part of the variables are transformed in each layer, many layers are still needed for strong feature mixing.
+
+Glow extends this framework further by improving scalability and representation learning for high-dimensional images. It retains affine coupling and multi-scale design but replaces fixed permutations with invertible 1×1 convolutions, allowing learned channel mixing between layers. It also introduces actnorm for more stable training. Glow produces better image quality and more useful latent representations, but at the cost of higher memory and computational demands.
+
+Taken together, these papers show a clear progression from simple but limited transformations to more expressive and scalable architectures. Their main shared insight is that flow-based models can achieve exact density estimation and reversible inference, though this comes with trade-offs between tractability, expressiveness, and computational cost.
+
+
+\section{Proposed Direction of Work}
+
+\subsection{Hypothesis 1}
+How do intermediate transformations in flow-based models progressively map data distributions toward the Gaussian prior, and do more expressive architectures achieve this transformation earlier in the network? \\ \\
+\textbf{Motivation:} \\ 
+Mostly, all Flow-based models are typically evaluated using the final likelihood of generated samples, relatively little attention is given to how the distribution evolves internally across layers. Studying how distributions evolve across layers can provide insight into the internal learning dynamics of flow models. \\ 
+\textbf{Proposed Approach:} 
+\begin{enumerate}
+    \item Model training: Train the three Flow-based models: NICE, Real NVP, and GLOW. 
+    \item Extraction of Intermediate Representations
+    \item Measuring the Distribution Alignment
+    \item Visualization of Distribution Evolution.
+\end{enumerate}
+\textbf{Evaluation Plan:} 
+We will analyze: 
+\begin{itemize}
+    \item the change in divergence from the Gaussian prior across layers
+    \item the rate at which intermediate distributions approach the latent Gaussian
+    \item differences in transformation dynamics between architectures.
+\end{itemize}
+\subsection{Hypothesis 2} 
+Can allowing the masking pattern in coupling layers to be learned during training improve the adaptability of flow-based models and do different datasets lead to different learned masking structures.\\ \\
+\textbf{Motivation:} \\ 
+In coupling-layer based flow models such as Real NVP, transformations operate on only part of the input while the remaining part remains unchanged. This is implemented using a fixed masking pattern, they impose a predefined structure on how variables interact during the transformation process. However, different datasets may exhibit different dependency structures among features. Allowing the model to learn the masking pattern during training may enable it to better capture dataset-specific relationships.
+ \\ 
+\textbf{Proposed Approach:} 
+\begin{enumerate}
+    \item Baseline Model
+    \item Learnable Masking Mechanism
+    \item Training on Multiple Datasets
+    \item Analysis of Learned Masks
+\end{enumerate}
+\textbf{Evaluation Plan} 
+We will analyze: 
+\begin{itemize}
+    \item Generative Performance: log- likelihood on held-out data, bits per dimension for image datasets and qualitative evaluation of generated samples.
+\item Mask Structure Analysis 
+\item Comparison with Fixed Masking
+\end{itemize}
+
+\subsection{Hypothesis 3}
+
+Does replacing the standard Maximum Likelihood Estimation (MLE) training objective with Maximum A Posteriori (MAP) estimation improve the training efficiency or generalization of flow-based models across different datasets? \\ \\
+\textbf{Motivation:} \\ 
+Flow-based generative models are typically trained using maximum likelihood estimation, while this objective allows exact likelihood computation due to the invertible structure of flows, it does not incorporate prior knowledge about model parameters and may lead to overfitting. Maximum A Posterior estimation extends MLE by introducing a prior distribution over model parameters, effectively regularizing the training process. \\ 
+\textbf{Proposed Approach:} 
+
+\begin{itemize}
+\item Baseline MLE Training
+\item MAP-Based Training Objective
+\item Training Across Multiple Datasets
+\item Training Efficiency Analysis: We will track metrics related to optimization efficiency, including convergence speed, stability of training loss, sensitivity to hyperparameters.
+\end{itemize}
+
+
+\textbf{Evaluation Plan:} 
+\begin{itemize}
+\item Generative Performance
+\item Training Dynamics: we will analyze convergence rate during training, variance in training loss across epochs, differences in training stability between MLE and MAP objectives.
+
+\item Dataset-Specific Effects
+\end{itemize}
+
+\section{Expected Outcomes}
+\noindent The primary expected outcome of this project is a principled understanding of how design choices in flow-based generative models affect performance across tasks and datasets. In particular, we seek to study the progression from NICE to RealNVP and Glow in order to determine to what extent increased model expressiveness actually leads to better generative modeling performance, rather than assuming that more complex architectures are always preferable. We expect this comparison to clarify the trade-offs between tractable likelihood computation, representational power, computational cost, and training stability, and to show how different architectural components contribute to these trade-offs in practice.
+
+\noindent A second learning objective is to examine how modeling assumptions interact with data characteristics. We expect that different dataset types may favor different masking strategies, since the usefulness of spatial, channel-wise, or structured masking depends on the underlying correlations present in the data. In addition, we aim to compare maximum likelihood estimation (MLE), which is the standard training objective for normalizing flows, with a maximum a posteriori (MAP) perspective that incorporates prior information over parameters. This comparison is expected to provide insight into whether priors can improve generalization, robustness, or parameter regularization, especially in settings where pure likelihood maximization may encourage overfitting.
+
+\noindent We also seek to explore the use cases of different flow based generative models and their architectures, like imposing equivariant conditions on the invertible functions for molecular generation, changing of existing algorithms to accommodate time series inputs, and problem statments that require non-standard gaussian prior distributions.
+
+\section*{References}
+
+
+\small
+
+[1] Dinh, L.\ Krueger, D.\ \& Bengio, Y.\ (2014) NICE: Non-linear Independent Components Estimation. {\it arXiv preprint arXiv:1410.8516}.
+
+[2] Dinh, L.\ Sohl-Dickstein, J.\ \& Bengio, S.\ (2016) Density estimation using Real NVP. {\it arXiv preprint arXiv:1605.08803}.
+
+[3] Kingma, D.P.\ \& Dhariwal, P.\ (2018) Glow: Generative Flow with Invertible 1x1 Convolutions. {\it arXiv preprint arXiv:1807.03039}.
+
+[4] Wang, L.\ Li, S.\ Yang, F.\ Wang, J.\ Zhang, Z.\ Liu, Y.\ Wang, Y.\ \& Yang, J.\ (2025) Not All Parameters Matter: Masking Diffusion Models for Enhancing Generation Ability. {\it arXiv preprint arXiv:2505.03097}.
+
+[5] Scott, D.W.\ (1992) {\it Multivariate Density Estimation: Theory, Practice, and Visualization}. New York: John Wiley \& Sons.
+
+[6] Papamakarios, G.\ Nalisnick, E.\ Rezende, D.J.\ Mohamed, S.\ \& Lakshminarayanan, B.\ (2021) Normalizing Flows for Probabilistic Modeling and Inference. {\it Journal of Machine Learning Research} 22(57), pp.\ 1--64.
+
+[7] McInnes, L.\ Healy, J.\ \& Melville, J.\ (2018) UMAP: Uniform Manifold Approximation and Projection for Dimension Reduction. {\it arXiv preprint arXiv:1802.03426}.
+
+[8] van der Maaten, L.\ \& Hinton, G.\ (2008) Visualizing Data using t-SNE. {\it Journal of Machine Learning Research} 9, pp.\ 2579--2605.
+
+[9] Irwin, R.\ Tibo, A.\ Janet, J.-P.\ \& Olsson, S.\ (2024) Efficient 3D Molecular Generation with Flow Matching and Scale Optimal Transport. {\it arXiv preprint arXiv:2406.07266}.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}
