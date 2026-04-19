@@ -72,17 +72,6 @@ def parse_losses_from_log(file_path):
                     val_losses.append(float(val_match.group(1)))
 
     return train_losses, val_losses
-# def plot_loss(train_losses, val_losses):
-#     plt.figure()
-#     plt.rcParams['figure.dpi'] = 120
-#     plt.plot(train_losses, label="Train")
-#     plt.plot(val_losses, label="Validation")
-#     plt.xlabel("Epoch")
-#     plt.ylabel("Loss (log-likelihood)")
-#     plt.title("Training Curve")
-#     plt.legend()
-#     plt.grid()
-#     plt.savefig('training_curve.png', dpi=300, bbox_inches='tight')
 import matplotlib.pyplot as plt
 
 def plot_training_results(train_losses, val_losses):
@@ -113,43 +102,7 @@ def plot_training_results(train_losses, val_losses):
     plt.savefig('training_curve.png')
     plt.show()
 
-# Example usage with your final data points:
-# train_hist = [-1090.18, ..., -1936.42]
-# val_hist = [-1078.67, ..., -1888.94]
-# plot_training_results(train_hist, val_hist)
 
-# def show_real_vs_generated(model, prior, data_loader, device, n=64):
-#     model.eval()
-#     dataset_name = 'mnist'
-#     nvis = NICE.PRESETS[dataset_name]['nvis']
-
-#     # ---- Get REAL images ----
-#     x_real, _ = next(iter(data_loader))
-#     x_real = x_real[:n].to(device)
-
-#     # ---- Generate FAKE images ----
-#     with torch.no_grad():
-#         z = prior.sample(n, nvis).to(device)  # Pass dim explicitly
-#         x_fake = model.decode(z)
-#     x_fake = x_fake.cpu()
-#     # ---- Make grids ----
-#     real_grid = vutils.make_grid(x_real.view(-1, 1, 28, 28), nrow=8, normalize=True)
-#     fake_grid = vutils.make_grid(x_fake.view(-1, 1, 28, 28), nrow=8, normalize=True)
-   
-#     # ---- Plot ----
-#     plt.figure(figsize=(8, 8))
-#     plt.subplot(2, 1, 1)
-#     plt.imshow(real_grid.permute(1, 2, 0).cpu())
-#     plt.axis('off')
-#     plt.title("Real Images")
-
-#     plt.subplot(2, 1, 2)
-#     plt.imshow(fake_grid.permute(1, 2, 0).cpu())
-#     plt.axis('off')
-#     plt.title("Generated Samples")
-
-#     plt.tight_layout()
-#     plt.savefig('real_vs_sampled.png', dpi=300, bbox_inches='tight')
 
 def show_real_vs_reconstructed(model, data_loader, device, n=64):
     """
@@ -240,7 +193,6 @@ def plot_latent_distribution(model, data_loader, device):
 
     zs = np.concatenate(zs, axis=0)
 
-    # 🔥 Bigger and clearer plot
     plt.figure(figsize=(10, 6))   # (width, height) in inches
 
     plt.hist(zs.flatten(), bins=100, density=True)
@@ -299,14 +251,14 @@ if __name__ == "__main__":
     
     plot_training_results(train_losses, val_losses)
     # ── Visualizations ───────────────────────
-    print("\n🔍 Showing real vs generated samples...")
+    print("\n Showing real vs generated samples...")
     show_real_vs_reconstructed(model, test_loader, device)
 
-    print("\n🔁 Showing reconstructions...")
+    print("\n Showing reconstructions...")
     show_reconstructions(model, test_loader, device)
 
-    print("\n📊 Plotting latent distribution...")
+    print("\n Plotting latent distribution...")
     plot_latent_distribution(model, test_loader, device)
 
-    print("\n🔀 Showing interpolation...")
+    print("\n Showing interpolation...")
     interpolate(model, test_loader, device)
