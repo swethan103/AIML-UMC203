@@ -111,19 +111,6 @@ if __name__ == '__main__':
     BETA1 = 0.9
     BETA2 = 0.999  # in paper 0.01 -> 0.999 because 0.01 lead to unstable epochs
     EPS = 1e-4    # Paper value of 1e-4
-    # scale_params = []
-    # other_params = []
-    
-    # for name, param in model.named_parameters():
-    #     if "log_scale" in name:
-    #         scale_params.append(param)
-    #     else:
-    #         other_params.append(param)
-    
-    # optimizer = torch.optim.Adam([
-    #     {"params": scale_params, "weight_decay": 1e-4},
-    #     {"params": other_params, "weight_decay": 0.0}
-    # ], lr=1e-3)
     optimizer = torch.optim.Adam(
         model.parameters(), 
         lr=LR, 
@@ -210,22 +197,6 @@ if __name__ == '__main__':
               f"z_mean: {z_mean:.3f} | z_std: {z_std:.3f} | "
               f"lr: {scheduler.get_last_lr()[0]:.6f}")
 
-        # # ── SAVE BEST ────────────────────────────────────────────────
-        # if avg_val_loss < best_val_loss:
-        #     best_val_loss = avg_val_loss
-        #     if CHECKPOINT_DIR == '/kaggle/input/datasets/agsmiling/forcontinuingtrainingofnice':
-        #       best_path = os.path.join('/kaggle/working/NICE_checkpoints', f'best_{DATASET}.pt')
-        #     best_path = os.path.join(CHECKPOINT_DIR, f'best_{DATASET}.pt')
-        #     save_checkpoint(model, optimizer, epoch + 1, best_val_loss, best_path)
-        #     print(f"  New best model at epoch {epoch+1} "
-        #           f"(val: {best_val_loss:.4f})")
-
-        # # ── REGULAR CHECKPOINT ───────────────────────────────────────
-        # if (epoch + 1) % 5 == 0:
-        #     path = os.path.join(CHECKPOINT_DIR, f'ckpt_{DATASET}_{epoch+1}.pt')
-        #     if CHECKPOINT_DIR == '/kaggle/input/datasets/agsmiling/forcontinuingtrainingofnice':
-        #       path = os.path.join('/kaggle/working/NICE_checkpoints', f'best_{DATASET}.pt')
-        #     save_checkpoint(model, optimizer, epoch + 1, best_val_loss, path)
         # ── SAVE BEST ────────────────────────────────────────────────
         if avg_val_loss < best_val_loss:
             best_val_loss = avg_val_loss
@@ -251,11 +222,6 @@ if __name__ == '__main__':
             os.makedirs(save_dir, exist_ok=True)
             path = os.path.join(save_dir, f'ckpt_{DATASET}_{epoch+1}.pt')
             save_checkpoint(model, optimizer, epoch + 1, best_val_loss, path)
-    # if CHECKPOINT_DIR == '/kaggle/input/datasets/agsmiling/forcontinuingtrainingofnice':
-    #           final_path = os.path.join('/kaggle/working/NICE_checkpoints', f'final_{DATASET}.pt')
-    # final_path = os.path.join(CHECKPOINT_DIR, f'final_{DATASET}.pt')
-    # save_checkpoint(model, optimizer, EPOCHS, best_val_loss, final_path)
-    # Ensure we save to /working/ if we started from /input/
     if "/kaggle/input/" in CHECKPOINT_DIR:
         final_save_dir = '/kaggle/working/NICE_checkpoints'
     else:
