@@ -1,0 +1,4 @@
+Layer 0: Arm 30 -> spiral__transpose
+Layer 1: Arm 27 -> spiral__rot270
+Layer 2: Arm 25 -> spiral__rot90
+Layer 3: Arm 23 -> diag_sum__anti_transpose

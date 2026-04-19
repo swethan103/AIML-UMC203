@@ -1,0 +1,14 @@
+{
+  "greedy_arms": [
+    30,
+    27,
+    25,
+    23
+  ],
+  "greedy_arm_names": [
+    "spiral__transpose",
+    "spiral__rot270",
+    "spiral__rot90",
+    "diag_sum__anti_transpose"
+  ]
+}
